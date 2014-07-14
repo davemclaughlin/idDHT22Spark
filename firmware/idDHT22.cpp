@@ -142,8 +142,9 @@ void idDHT22::isrCallback() {
 									-word(_bits[2] & 0x7F, _bits[3]) :
 									word(_bits[2], _bits[3]))
 									* 0.1;
-									uint8_t sum = _bits[0] + _bits[1] + _bits[2] + _bits[3];
 							}
+							uint8_t sum = _bits[0] + _bits[1] + _bits[2] + _bits[3];
+							
 							if (_bits[4] != sum) {
 								_status = IDDHTLIB_ERROR_CHECKSUM;
 								_state = STOPPED;
