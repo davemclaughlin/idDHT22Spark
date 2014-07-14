@@ -68,6 +68,7 @@ public:
 	float getHumidity();
 	bool acquiring();
 	int getStatus();
+	void setType(int type);
 
 private:
 	void (*isrCallback_wrapper)(void);
