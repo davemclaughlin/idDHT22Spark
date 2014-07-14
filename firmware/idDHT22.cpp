@@ -40,6 +40,15 @@ void idDHT22::init(int sigPin, void (*callback_wrapper) ()) {
 	digitalWrite(sigPin, HIGH);
 	_state = STOPPED;
 	_status = IDDHTLIB_ERROR_NOTSTARTED;
+	_type = 1;	//DHT11 as default
+}
+
+void idDHT22::setType(int type)
+{
+	//
+	// 0 is DHT22 and 1 is DHT11
+	//
+	_type = type;
 }
 
 int idDHT22::acquire() {
@@ -120,13 +129,21 @@ void idDHT22::isrCallback() {
 						_cnt = 7; // restart at MSB
 						if(_idx++ == 4) { // go to next byte, if we have got 5 bytes stop.
 							detachInterrupt(_sigPin);
-							// WRITE TO RIGHT VARS
-							_hum = word(_bits[0], _bits[1]) * 0.1;
-							_temp = (_bits[2] & 0x80 ? 
-								-word(_bits[2] & 0x7F, _bits[3]) :
-								word(_bits[2], _bits[3]))
-								* 0.1;
-								uint8_t sum = _bits[0] + _bits[1] + _bits[2] + _bits[3];
+							if(_type == 1)	// DHT11
+							{
+								_hum = _bits[0];
+								_temp= _bits[2];
+							}
+							else
+							{
+								// WRITE TO RIGHT VARS
+								_hum = word(_bits[0], _bits[1]) * 0.1;
+								_temp = (_bits[2] & 0x80 ? 
+									-word(_bits[2] & 0x7F, _bits[3]) :
+									word(_bits[2], _bits[3]))
+									* 0.1;
+									uint8_t sum = _bits[0] + _bits[1] + _bits[2] + _bits[3];
+							}
 							if (_bits[4] != sum) {
 								_status = IDDHTLIB_ERROR_CHECKSUM;
 								_state = STOPPED;
